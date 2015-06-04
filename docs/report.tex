@@ -1,0 +1,202 @@
+\documentclass[11pt,a4paper]{article}
+
+% basic packages
+\usepackage{float}
+\usepackage{fullpage}
+\usepackage{polski}
+\usepackage{graphicx}
+\usepackage[utf8x]{inputenc}
+
+% bibliography and links
+\usepackage{url}
+\usepackage{cite}
+\def\UrlBreaks{\do\/\do-}
+\usepackage[hidelinks]{hyperref}
+
+% graphs
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+% tables
+\usepackage{tabularx}
+\usepackage{multicol}
+
+% listings
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{
+  basicstyle=\footnotesize,    
+  captionpos=b,             
+  commentstyle=\color{dkgreen},  
+  frame=single,       
+  keywordstyle=\color{blue},  
+  language=Python,   
+  numbers=left,     
+  numbersep=7pt,   
+  numberstyle=\tiny\color{gray}, 
+  rulecolor=\color{black},  
+  stringstyle=\color{mauve}, 
+  tabsize=2,    
+  title=\lstname
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \begin{center}
+
+    \textsc{\Large Politechnika Warszawska}\\[0.1cm]
+    \small Wydział Elektroniki i Technik Informacyjnych
+    \vfill
+
+    \textsc{\small Systemy Agentowe}\\[0.1cm]
+    \Huge Wieloagentowy system giełdowy\\[1.5cm]
+    \small Sprawozdanie wstępne\\[2.5cm]
+
+    \vfill
+
+    \begin{minipage}{0.4\textwidth}
+      \begin{flushleft} \large
+        \emph{Autorzy:}\\[0.1cm]
+        Jacek \textsc{Sosnowski}\\
+        Maciej \textsc{Suchecki}\\
+        Jacek \textsc{Witkowski}\\
+      \end{flushleft}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+      \begin{flushright} \large
+        \emph{Prowadzący:}\\[0.1cm]
+        dr~inż.~Piotr \textsc{Andruszkiewicz}\\[1cm]
+      \end{flushright}
+    \end{minipage}
+
+    \vfill
+    {\large \today}
+
+  \end{center}
+\end{titlepage}
+
+\section{Treść zadania}
+\paragraph{Tytuł} Wieloagentowy system giełdowy
+\paragraph{Opis}
+Celem projektu jest stworzenie systemu symulacji giełdowej, w~której udział biorą dwa typy agentów:
+\begin{itemize}
+  \item grające indywidualnie,
+  \item grające w grupie.
+\end{itemize}
+Celem każdego z~agentów jest podejmowanie takich decyzji o~kupnie lub~sprzedaży akcji, by~uzyskać jak największy zysk. Agenty grające w~grupie aby osiągnąć większy zysk niż inne agenty tworzą bański spekulacyjne. Z~tego powodu wymieniają ze~sobą informacje o~aktualnej strategii działania.
+
+\section{Opis rozwiązania}
+System składać się będzie z trzech modułów:
+\begin{itemize}
+  \item serwera symbolizującego giełdę,
+  \item agenta indywidualnego,
+  \item agenta grupowego.
+\end{itemize}
+
+Po uruchomieniu symulacji program będzie uruchamiał serwer giełdowy, a~następnie inicjalizował zdefiniowaną przez użytkownika liczbę agentów indywidualnych oraz grupowych. Każdy z~agentów, po~uruchomieniu będzie próbował zarejestrować się w~serwerze giełdowym, przy czym agenty grupowe będą automatycznie nawiązywały połączenia również między sobą. Następnie jeden z~agentów grupowych zostanie koordynatorem grupy. Potem w~pętli wykonują się kolejne iteracje symulacji.
+
+\paragraph{Przebieg iteracji}
+\begin{enumerate}
+  \item Agenty pytają o~cenę akcji w~poprzedniej iteracji.
+  \item Na podstawie historii cen akcji agenty podejmują decyzje o kupnie lub sprzedaży akcji.
+  \item Agenty zgłaszają serwerowi oferty.
+  \item Agenty czekają na~zakończenie iteracji i~pobierają rezultat ich transakcji z~serwera, aktualizując dane.
+\end{enumerate}
+
+Iteracje są~powtarzane, dopóki nie zostanie przekroczony ich -- zdefiniowany wcześniej -- limit, lub użytkownik przerwie wykonywanie symulacji ręcznie.
+
+\subsection{Wybór koordynatora}
+Zaraz po utworzeniu wszystkie agenty grupowe zaczynają procedurę wyboru koordynatora, który będzie podejmował
+decyzje o~wykonywanych wspólnie akcjach. W~pierwszej kolejności każdy z~agentów grupowych rozgłasza losowo
+wygenerowany numer i~czeka przez określony w~konfiguracji czas na~zgłoszenia innych agentów. Po~upływie
+określonego czasu każdy agent grupowy sprawdza czy jego numer był największy i~jeśli tak, rozgłasza
+do~pozostałych agentów, że jest koordynatorem. W~odpowiedzi agenty zgłaszają mu~swój numer użytkownika wraz ze~stanem konta.
+
+\newpage
+\subsection{Pozostałe założenia}
+\begin{itemize}
+  \item dostępny jest tylko jeden typ akcji,
+  \item każdy z~agentów przy inicjalizacji losuje, jak dużą ilością pieniędzy dysponuje,
+  \item każdy z~agentów zgłasza tylko jedną ofertę na~iterację.
+\end{itemize}
+
+\subsection{Opis modułów}
+\subsubsection{Serwer giełdowy}
+Serwer symbolizujący w~symulacji giełdę będzie napisany w~języku Python, prawdopodobnie z~wykorzystaniem biblioteki \textit{Flask}. Biblioteka ta~zostanie wykorzystana do~obsługiwania zapytań \textit{REST}, które będą używane do~komunikacji z~agentami. Serwer będzie miał cztery główne zadania:
+\begin{multicols}{2}
+  \begin{itemize}
+    \item komunikacja z~agentami,
+    \item wyliczanie aktualnej ceny akcji,
+    \item nawiązywanie transakcji,
+    \item prezentacja przebiegu symulacji.
+  \end{itemize}
+\end{multicols}
+
+Serwer giełdy, po uruchomieniu, ustala liczbę dostępnych akcji oraz generuję historię zmian cen. Parametry te~mogą być konfigurowane przez użytkownika przed uruchomieniem symulacji.
+
+\paragraph{Komunikacja z~agentami}
+W~celu komunikacji z~agentami, serwer będzie udostępniał \textit{API} zgodne ze~specyfikacją \textit{REST}. Dostępne będą następujące metody:
+\begin{figure}[H]
+  \begin{tabularx}{\textwidth}{ |p{2cm}|p{1cm}|p{5cm}|p{2.5cm}|X| }
+    \hline \textbf{Adres} & \textbf{Typ} & \textbf{Parametry} & \textbf{Zwracana wartość} & \textbf{Opis} \\ \hline
+    /brokers & POST & - & ID zarejestrowanego brokera & Metoda służąca do~rejestrowania nowego agenta w~symulacji. \\ \hline
+    /stock/price & GET & \textbf{day} numer iteracji & cena akcji w~danej iteracji & Metoda służąca do~pobierania historycznej ceny akcji. \\ \hline
+    /stock/buy & POST & \textbf{price} proponowana cena, \textbf{amount} liczba akcji do~kupienia & liczba kupionych akcji i~ich cena & Metoda służąca do~złożenia oferty zakupu akcji przez agenta. \\ \hline
+    /stock/sell & POST & \textbf{price} proponowana cena, \textbf{amount} liczba akcji do~sprzedania & liczba kupionych akcji i~ich cena & Metoda służąca do~złożenia oferty sprzedaży akcji przez agenta. \\ \hline
+  \end{tabularx}
+\end{figure}
+
+\paragraph{Wyliczanie ceny akcji}
+Aktualna cena akcji (w~danej iteracji) będzie wyznaczana na~podstawie aktualnych ofert (czyli popytu oraz podaży dla danej akcji) jako cena równowagi rynkowej.
+
+\paragraph{Prezentacja przebiegu symulacji}
+W~trakcie trwania symulacji, serwer będzie udostępniał stronę internetową dostępną z~poziomu przeglądarki. Będą na~niej dostępne dane nt. aktualnego przebiegu symulacji, między innymi wykres ceny akcji.
+
+\subsubsection{Agent indywidualny}
+\paragraph{Strategia}
+Jedyne informacje, jakie wpływają na~decyzje o~kupnie lub sprzedaży akcji przez~agenta indywidualnego, to~historia zmian cen akcji. W~realizowanym projekcie przyjęto, że~agent kupuje akcje, jeśli ich cena w~ciągu ostatnich k iteracji wzrosła i sprzedaje, jeśli ich cena w~ciągu ostatnich k iteracji spadła.
+
+\subsubsection{Agent grupowy}
+\paragraph{Strategia}
+W~przeciwieństwie do~agentów indywidualnych agenty grupowe podejmują decyzję zarówno na~podstawie informacji o~zmianach cen akcji, jak i~na~podstawie informacji o~zamiarach innych agentów grupowych. Wszystkie agenty grupowe tworzą jedną grupę, która stara się~maksymalizować średni zysk przypadający na~członka grupy, poprzez tworzenie baniek spekulacyjnych. 
+
+Koordynator podejmuje decyzje o~tworzeniu bańki spekulacyjnej od~razu po~otrzymaniu kompletu informacji o~członkach grupy. Wówczas rozgłasza informację o kupowaniu akcji przez~k~kolejnych iteracji. Po~upływie k~iteracji agenty otrzymują polecenie sprzedaży wszystkich posiadanych akcji. Następnie, gdy koordynator zauważy, że~w~ciągu ostatnich n iteracji cena akcji nie spadła bardziej niż o~5\%, wysyła polecenie utworzenia kolejnej bańki spekulacyjnej itd.
+
+\paragraph{Komunikacja agentów}
+Agenty grupowe muszą się~ze~sobą porozumiewać po~to, by:
+\begin{itemize}
+  \item ustalać, kto jest koordynatorem,
+  \item wymieniać informacje o~stanach portfeli agentów,
+  \item podejmować decyzję o~kupnie lub sprzedaży.
+\end{itemize}
+
+Stąd, konieczne jest zdefiniowanie interfejsu komunikacyjnego właściwego dla~tego typu agentów.
+
+\begin{figure}[H]
+  \begin{tabularx}{\textwidth}{ |p{4cm}|p{2.5cm}|p{2.5cm}|X| }
+    \hline
+    \textbf{Wiadomość} & \textbf{Parametry} & \textbf{Zwracana wartość} & \textbf{Opis} \\
+    \hline
+    WhosMaster & losowo wygenerowana liczba & referencja na~koordynatora lub null & wiadomość przesyłana
+    do~agenta w~celu uzyskania informacji o~tym, kto~jest koordynatorem. Dodatkowo należy podać własną losową liczbę. Jeśli koordynator już~został
+    wybrany, metoda od~razu zwraca referencję do~koordynatora. Jeśli procedura wyboru koordynatora trwa,
+    metoda nie~zwraca żadnej wartości.\\
+    \hline
+    ImMaster & - & - & Wiadomość przesyłana do~agenta w~celu przekazania mu~informacji o~nowym koordynatorze. \\
+    \hline
+    WhatsYourAccountState & - & ilość pieniędzy & Wiadomość przesyłana do~agenta w~celu uzyskania
+    informacji o~stanie jego portfela.\\
+    \hline
+  \end{tabularx}
+\end{figure}
+
+\paragraph{Platforma MAS}
+Do~implementacji agentów postanowiono wykorzystać język Scala. Do~zapewnienia komunikacji pomiędzy agentami
+grupowymi wykorzystana zostanie platforma Akka.
+
+
+\end{document}
