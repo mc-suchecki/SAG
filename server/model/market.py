@@ -14,9 +14,11 @@ class Market:
     traders = []
     purchase_offers = []
     sale_offers = []
+    current_iteration = 0
 
     def __init__(self):
         self.stock = Stock(DEFAULT_TICKER)
+        self.current_iteration = len(self.stock.price_history) + 1
         self.traders = []
         self.purchase_offers = []
         self.sale_offers = []

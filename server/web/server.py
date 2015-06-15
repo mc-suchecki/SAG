@@ -2,7 +2,7 @@
 __author__ = 'mc'
 
 from model.market import Market
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 
 class WebServer():
@@ -22,6 +22,7 @@ class WebServer():
     def __create_routes__(self):
         """ Attaches the REST URIs to class methods. """
         self.app.add_url_rule('/', 'main_page', self.main_page)
+        self.app.add_url_rule('/day', 'day', self.get_current_iteration, methods=['GET'])
         self.app.add_url_rule('/traders', 'traders', self.register_trader, methods=['POST'])
         self.app.add_url_rule('/traders/<id>', 'trader', self.get_trader_state, methods=['GET'])
         self.app.add_url_rule('/stock/price', 'price', self.get_stock_price, methods=['GET'])
@@ -31,7 +32,14 @@ class WebServer():
 
     def main_page(self):
         """ Displays webpage with simulation visualisation. """
-        return "Number of Traders registered so far: " + str(len(self.market.traders))
+        return render_template("index.html",
+                               traders_count=len(self.market.traders),
+                               current_iteration=self.market.current_iteration,
+                               traders=self.market.traders)
+
+    def get_current_iteration(self):
+        """ Returns number of the current iteration. """
+        return jsonify({"day": int(self.market.current_iteration)})
 
     def register_trader(self):
         """ Registers a new Trader - returns trader ID, cash amount and stocks number. """
