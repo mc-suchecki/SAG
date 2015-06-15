@@ -11,8 +11,8 @@ class Trader:
     stocks = INITIAL_STOCKS
     cash = INITIAL_CASH
 
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, trader_id):
+        self.id = trader_id
         self.cash = INITIAL_CASH
         self.stocks = INITIAL_STOCKS
 

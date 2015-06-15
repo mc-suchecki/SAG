@@ -2,7 +2,7 @@
 __author__ = 'mc'
 
 from server.model.market import Market
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 
 class WebServer():
@@ -23,6 +23,7 @@ class WebServer():
         """ Attaches the REST URIs to class methods. """
         self.app.add_url_rule('/', 'main_page', self.main_page)
         self.app.add_url_rule('/traders', 'traders', self.register_trader, methods=['POST'])
+        self.app.add_url_rule('/price', 'price', self.get_stock_price, methods=['GET'])
 
     def main_page(self):
         """ Displays webpage with various statistics. """
@@ -33,3 +34,7 @@ class WebServer():
         trader = self.market.add_trader()
         return jsonify({'id': trader.id, 'cash': trader.cash, 'stocks': trader.stocks})
 
+    def get_stock_price(self):
+        """ Returns historical stock price. """
+        day = request.args["day"]
+        return jsonify({'price': float(self.market.get_stock_price(int(day)))})

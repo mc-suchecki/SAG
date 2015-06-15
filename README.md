@@ -1,2 +1,2 @@
 # SAG
-Stock exchange simulation, with stock exchange server written Python and traders written in Scala.
+Stock exchange simulation, with Python stock exchange server and Scala traders.

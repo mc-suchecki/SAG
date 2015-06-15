@@ -1,22 +1,30 @@
-__author__ = 'mc'
-
+from server.model.stock import Stock
 from server.model.trader import Trader
 import logging
+
+__author__ = 'mc'
+
+DEFAULT_TICKER = "GOOG"
 
 
 class Market:
     """ Class representing the stock exchange market model. """
+    stock = None
     traders = []
-    traders_count = 0
+    offers = []
 
     def __init__(self):
         self.traders = []
-        self.traders_count = 0
+        self.stock = Stock(DEFAULT_TICKER)
 
     def add_trader(self):
         """ Adds new trader to the market. """
-        self.traders_count += 1
-        trader = Trader(self.traders_count)
+        trader = Trader(len(self.traders) + 1)
         self.traders.append(trader)
         logging.info("New Trader registered! " + str(trader))
         return trader
+
+    def get_stock_price(self, day):
+        """ Returns historical stock price in a given day. """
+        return self.stock.price_history[day]
+
