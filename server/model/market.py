@@ -28,6 +28,10 @@ class Market:
         logging.info("New Trader registered! " + str(trader))
         return trader
 
+    def get_trader_status(self, trader_id):
+        """ Returns current status of a trader. """
+        return self.traders[int(trader_id) - 1]
+
     def get_stock_price(self, day):
         """ Returns historical stock price in a given day. """
         return self.stock.price_history[day]

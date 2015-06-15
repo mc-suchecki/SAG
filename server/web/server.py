@@ -23,6 +23,7 @@ class WebServer():
         """ Attaches the REST URIs to class methods. """
         self.app.add_url_rule('/', 'main_page', self.main_page)
         self.app.add_url_rule('/traders', 'traders', self.register_trader, methods=['POST'])
+        self.app.add_url_rule('/traders/<id>', 'trader', self.get_trader_state, methods=['GET'])
         self.app.add_url_rule('/stock/price', 'price', self.get_stock_price, methods=['GET'])
         self.app.add_url_rule('/stock/history', 'history', self.get_stock_price_history, methods=['GET'])
         self.app.add_url_rule('/stock/buy', 'buy', self.place_purchase_offer, methods=['POST'])
@@ -36,6 +37,14 @@ class WebServer():
         """ Registers a new Trader - returns trader ID, cash amount and stocks number. """
         trader = self.market.add_trader()
         return jsonify({'id': trader.id, 'cash': trader.cash, 'stocks': trader.stocks})
+
+    def get_trader_state(self, id):
+        """ Returns current state of a trader - number of currently owned stocks and cash.
+        :param id: ID of the Trader
+        :return: all available and up-to-date data about Trader
+        """
+        trader = self.market.get_trader_status(id)
+        return jsonify(trader.__dict__)
 
     def get_stock_price(self):
         """ Returns historical stock price. """
