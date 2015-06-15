@@ -24,6 +24,7 @@ class WebServer():
         self.app.add_url_rule('/', 'main_page', self.main_page)
         self.app.add_url_rule('/traders', 'traders', self.register_trader, methods=['POST'])
         self.app.add_url_rule('/stock/price', 'price', self.get_stock_price, methods=['GET'])
+        self.app.add_url_rule('/stock/history', 'history', self.get_stock_price_history, methods=['GET'])
         self.app.add_url_rule('/stock/buy', 'buy', self.place_purchase_offer, methods=['POST'])
         self.app.add_url_rule('/stock/sell', 'sell', self.place_sale_offer, methods=['POST'])
 
@@ -40,6 +41,10 @@ class WebServer():
         """ Returns historical stock price. """
         day = request.args["day"]
         return jsonify({'price': float(self.market.get_stock_price(int(day)))})
+
+    def get_stock_price_history(self):
+        """ Returns all historical stock prices. """
+        return jsonify({'price_history': self.market.get_stock_price_history()})
 
     def place_purchase_offer(self):
         """ Allows traders to place offers to buy a stock. """

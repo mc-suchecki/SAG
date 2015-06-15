@@ -32,12 +32,17 @@ class Market:
         """ Returns historical stock price in a given day. """
         return self.stock.price_history[day]
 
+    def get_stock_price_history(self):
+        """ Returns whole prices history of a stock. """
+        return self.stock.price_history
+
     def place_purchase_offer(self, trader_id, price, stocks):
         """ Places an offer to buy a stock.
         :param trader_id: ID of the trader that wants to buy a stock.
         :param price: Proposed price of one stock.
         :param stocks: Number of the stocks that the trader wants to buy.
         """
+        # TODO check if the offer is valid (trader exists, price and stocks over 0 and so on)
         offer = PurchaseOffer(trader_id, price, stocks)
         self.purchase_offers.append(offer)
         logging.info("New Offer registered! " + str(offer))
@@ -48,6 +53,7 @@ class Market:
         :param price: Proposed price of one stock.
         :param stocks: Number of the stocks that the trader wants to sell.
         """
+        # TODO check if the offer is valid (trader exists, price and stocks over 0 and so on)
         offer = SaleOffer(trader_id, price, stocks)
         self.purchase_offers.append(offer)
         logging.info("New Offer registered! " + str(offer))
