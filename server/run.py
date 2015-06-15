@@ -1,7 +1,7 @@
 """ This is the main file of web server that is simulating stack exchange market. """
 __author__ = 'mc'
 
-from server.web.server import WebServer
+from web.server import WebServer
 import logging
 import sys
 

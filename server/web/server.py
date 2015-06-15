@@ -1,7 +1,7 @@
 """ Main web server file - defines the server REST API. """
 __author__ = 'mc'
 
-from server.model.market import Market
+from model.market import Market
 from flask import Flask, jsonify, request
 
 
@@ -23,7 +23,7 @@ class WebServer():
         """ Attaches the REST URIs to class methods. """
         self.app.add_url_rule('/', 'main_page', self.main_page)
         self.app.add_url_rule('/traders', 'traders', self.register_trader, methods=['POST'])
-        self.app.add_url_rule('/price', 'price', self.get_stock_price, methods=['GET'])
+        self.app.add_url_rule('/stock/price', 'price', self.get_stock_price, methods=['GET'])
 
     def main_page(self):
         """ Displays webpage with various statistics. """

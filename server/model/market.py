@@ -1,5 +1,5 @@
-from server.model.stock import Stock
-from server.model.trader import Trader
+from model.stock import Stock
+from model.trader import Trader
 import logging
 
 __author__ = 'mc'
