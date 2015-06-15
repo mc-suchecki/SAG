@@ -8,18 +8,18 @@ import common.{AbstractTrader, Init}
  */
 class SimpleTrader extends AbstractTrader {
   override def receive: Receive = {
-    case Init => {
+    case Init =>
       println("SimpleTrader INIT")
       register()
 
       //TODO get history of prices
-      getHistory()
+      getHistory
       trade()
-    }
   }
 
-  def getHistory() = {
+  def getHistory = {
     //TODO
+    null
   }
 
   def trade() = {

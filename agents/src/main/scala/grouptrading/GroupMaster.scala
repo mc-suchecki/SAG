@@ -1,10 +1,8 @@
 package grouptrading
 
-import akka.actor.{ActorRef, Actor, Props}
+import akka.actor.Props
 import akka.routing.RoundRobinPool
-import common.{AbstractMaster, Init, AgentMessage}
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.impl.client.DefaultHttpClient
+import common.{AbstractMaster, Init}
 
 /**
  * Master for all group agents. It makes all buy/sell decisions by itself and commands group agents to take proper
@@ -20,6 +18,4 @@ class GroupMaster(nrOfGroupTraders: Int) extends AbstractMaster
       println("GroupMaster INIT")
       initAgents(nrOfGroupTraders, agentsRouter)
   }
-
-  //TODO
 }

@@ -8,10 +8,22 @@ import common.{AbstractTrader, Init}
  */
 class GroupTrader extends AbstractTrader {
   override def receive: Receive = {
-    case Init => {
+    case Init =>
       println("GroupTrader INIT")
       register()
+    case Buy =>
+      buy()
+    case Sell =>
+      sell()
+  }
+
+  def buy() = {
+      println("GroupTrader BUY")
       //TODO
-    }
+  }
+
+  def sell() = {
+      println("GroupTrader SELL")
+      //TODO
   }
 }

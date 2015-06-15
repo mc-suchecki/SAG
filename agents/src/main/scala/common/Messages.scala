@@ -1,6 +1,6 @@
 package common
 
-/** Supertype for all messages sent in the application. */
+/** Super-type for all messages sent in the application. */
 trait AgentMessage
 
 /** Message sent to actors telling them to start running. */

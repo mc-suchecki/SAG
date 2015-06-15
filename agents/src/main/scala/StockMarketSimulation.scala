@@ -8,7 +8,7 @@ object StockMarketSimulation {
     if(args.length != 2)
     {
       println("Usage: trade nrOfGroupTraders nrOfSimpleTraders")
-      return;
+      return
     }
 
     val nrOfGroupTraders = args(0).toInt
