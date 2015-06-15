@@ -16,10 +16,9 @@ class GroupMaster(nrOfGroupTraders: Int) extends AbstractMaster
     Props[GroupTrader].withRouter(RoundRobinPool(nrOfGroupTraders)), name = "groupAgentsRouter")
 
   override def receive: Receive = {
-    case Init => {
+    case Init =>
       println("GroupMaster INIT")
-      initAgents(nrOfGroupTraders, agentsRouter);
-    }
+      initAgents(nrOfGroupTraders, agentsRouter)
   }
 
   //TODO
