@@ -8,10 +8,26 @@
 <h1>Simulation data:</h1>
 <p>Number of traders registered: {{traders_count}}</p>
 <p>Current iteration: {{current_iteration}}</p>
+<p>Current stock price: {{current_stock_price}}</p>
+
 <h1>Traders data:</h1>
 <ul>
     {% for trader in traders %}
     <li><p>Trader {{trader.id}} has ${{trader.cash}} of cash and {{trader.stocks}} stocks.</p></li>
+    {% endfor %}
+</ul>
+
+<h1>Buy orders:</h1>
+<ul>
+    {% for order in buy_orders %}
+    <li><p>Order to buy {{order.stocks}} stocks for ${{order.price}} each.</p></li>
+    {% endfor %}
+</ul>
+
+<h1>Sell orders:</h1>
+<ul>
+    {% for order in sell_orders %}
+    <li><p>Order to sell {{order.stocks}} stocks for ${{order.price}} each.</p></li>
     {% endfor %}
 </ul>
 </body>
