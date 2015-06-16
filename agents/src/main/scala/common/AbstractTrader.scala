@@ -1,46 +1,93 @@
 package common
 
+import java.util
+
 import akka.actor.Actor
-import com.google.gson.JsonParser
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.impl.client.DefaultHttpClient
+import com.google.gson.JsonArray
+import config.Configuration
+import org.apache.http.NameValuePair
+import org.apache.http.client.entity.UrlEncodedFormEntity
+import org.apache.http.client.methods.{HttpGet, HttpPost}
+import org.apache.http.message.BasicNameValuePair
+
+import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /** Super-class for all trading agents. */
-abstract class AbstractTrader extends Actor {
-  private val url = "http://localhost:5000/traders"
-
-  protected var httpClient = new DefaultHttpClient
-
+abstract class AbstractTrader extends Actor with RestClient {
   protected var id: Integer = null
   protected var cash: Integer = null
   protected var stocks: Integer = null
+  protected var currentDay: Integer = null
 
-  def register() = {
-    val post = new HttpPost(url)
-
-    val response = httpClient.execute(post)
-    val entity = response.getEntity
-    var content = ""
-    
-    if(entity == null)
-    {
-      throw new ResponseException
-    }
-
-    val inputStream = entity.getContent
-    content = io.Source.fromInputStream(inputStream).getLines().mkString
-    inputStream.close()
-
-    val jsonParser = new JsonParser()
-    val jsonObject = jsonParser.parse(content).getAsJsonObject
+  protected def register() = {
+    val postRequest = new HttpPost(Configuration.serverUrl + "/traders")
+    val jsonObject = send(postRequest)
 
     cash = jsonObject.get("cash").getAsInt
     id = jsonObject.get("id").getAsInt
     stocks = jsonObject.get("stocks").getAsInt
+  }
 
-    httpClient.getConnectionManager.shutdown()
+  protected def downloadHistory(): mutable.Seq[Double] = {
+    val getRequest = new HttpGet(Configuration.serverUrl + "/stock/history")
+    val jsonObject = send(getRequest)
+    val jsonArray: JsonArray = jsonObject.getAsJsonArray("price_history")
+    val history = new mutable.MutableList[Double]
 
-    println(this.toString)
+    for(jsonElement <- jsonArray)
+      history += jsonElement.getAsDouble
+
+    history
+  }
+
+  protected def downloadPrice(day: Int): Double = {
+    val requestUrl: String = Configuration.serverUrl + "/stock/price?day=" + day.toString
+    println(requestUrl)
+    val getRequest = new HttpGet(requestUrl)
+    val jsonObject = send(getRequest)
+
+    jsonObject.getAsJsonPrimitive("price").getAsDouble
+  }
+
+  protected def downloadCurrentDay(): Int = {
+    val getRequest = new HttpGet(Configuration.serverUrl + "/day")
+    val jsonObject = send(getRequest)
+    jsonObject.getAsJsonPrimitive("day").getAsInt
+  }
+
+  protected def updateState(): Unit = {
+    val getRequest = new HttpGet(Configuration.serverUrl + "/traders/" + this.id.toString)
+    val jsonObject = send(getRequest)
+
+    cash = jsonObject.get("cash").getAsInt
+    id = jsonObject.get("id").getAsInt
+    stocks = jsonObject.get("stocks").getAsInt
+  }
+
+  protected def buy(price:Double, stocks:Int): Unit = {
+    //price stocks trader_id
+    val postRequest = new HttpPost(Configuration.serverUrl + "/stock/buy")
+
+    val parameters = new util.ArrayList[NameValuePair](3)
+    parameters.add(new BasicNameValuePair("price", price.toString))
+    parameters.add(new BasicNameValuePair("stocks", stocks.toString))
+    parameters.add(new BasicNameValuePair("trader_id", id.toString))
+    postRequest.setEntity(new UrlEncodedFormEntity(parameters))
+
+    send(postRequest)
+  }
+
+  protected def sell(price:Double, stocks:Int): Unit = {
+    val postRequest = new HttpPost(Configuration.serverUrl + "/stock/sell")
+
+    val parameters = new util.ArrayList[NameValuePair](3)
+    parameters.add(new BasicNameValuePair("price", price.toString))
+    parameters.add(new BasicNameValuePair("stocks", stocks.toString))
+    parameters.add(new BasicNameValuePair("trader_id", id.toString))
+    postRequest.setEntity(new UrlEncodedFormEntity(parameters))
+
+    send(postRequest)
   }
 
   override def toString: String = {

@@ -11,6 +11,7 @@ object StockMarketSimulation {
       return
     }
 
+    //TODO consider moving it to Configuration
     val nrOfGroupTraders = args(0).toInt
     val nrOfSimpleTraders = args(0).toInt
 

@@ -41,7 +41,7 @@ class WebServer():
 
     def get_current_iteration(self):
         """ Returns number of the current iteration. """
-        return jsonify({"day": int(self.market.current_iteration)})
+        return jsonify({"day": int(self.market.current_iteration)-1})
 
     def register_trader(self):
         """ Registers a new Trader - returns trader ID, cash amount and stocks number. """
@@ -67,17 +67,17 @@ class WebServer():
 
     def place_buy_order(self):
         """ Allows traders to place orders to buy a stock. """
-        price = request.args["price"]
-        stocks = request.args["stocks"]
-        trader_id = request.args["trader_id"]
+        price = request.form["price"]
+        stocks = request.form["stocks"]
+        trader_id = request.form["trader_id"]
         self.market.place_buy_order(trader_id, price, stocks)
         return ""
 
     def place_sell_order(self):
         """ Allows traders to place orders to sell a stock. """
-        price = request.args["price"]
-        stocks = request.args["stocks"]
-        trader_id = request.args["trader_id"]
+        price = request.form["price"]
+        stocks = request.form["stocks"]
+        trader_id = request.form["trader_id"]
         self.market.place_sell_order(trader_id, price, stocks)
         return ""
 

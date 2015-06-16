@@ -9,21 +9,28 @@ import common.{AbstractTrader, Init}
 class SimpleTrader extends AbstractTrader {
   override def receive: Receive = {
     case Init =>
-      println("SimpleTrader INIT")
       register()
-
-      //TODO get history of prices
-      getHistory
       trade()
   }
 
-  def getHistory = {
-    //TODO
-    null
-  }
 
   def trade() = {
-    //TODO
+    //TODO trading in loop
+
+    var day = downloadCurrentDay()
+    val price = downloadPrice(day - 1)
+
+    val quantityToBuy = (cash/price).toInt
+    if(quantityToBuy > 0)
+    {
+      buy(price, quantityToBuy)
+      println("BUY")
+    }
+    else
+    {
+      sell(price, stocks)
+      println("SELL")
+    }
   }
 
 }

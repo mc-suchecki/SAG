@@ -15,7 +15,6 @@ class GroupMaster(nrOfGroupTraders: Int) extends AbstractMaster
 
   override def receive: Receive = {
     case Init =>
-      println("GroupMaster INIT")
       initAgents(nrOfGroupTraders, agentsRouter)
   }
 }
