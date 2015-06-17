@@ -43,17 +43,16 @@ abstract class AbstractTrader extends Actor with RestClient {
 
   protected def downloadPrice(day: Int): Double = {
     val requestUrl: String = Configuration.serverUrl + "/stock/price?day=" + day.toString
-    println(requestUrl)
     val getRequest = new HttpGet(requestUrl)
     val jsonObject = send(getRequest)
 
     jsonObject.getAsJsonPrimitive("price").getAsDouble
   }
 
-  protected def downloadCurrentDay(): Int = {
+  protected def updateCurrentDay(): Unit = {
     val getRequest = new HttpGet(Configuration.serverUrl + "/day")
     val jsonObject = send(getRequest)
-    jsonObject.getAsJsonPrimitive("day").getAsInt
+    currentDay = jsonObject.getAsJsonPrimitive("day").getAsInt
   }
 
   protected def updateState(): Unit = {

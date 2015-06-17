@@ -11,17 +11,19 @@ class GroupTrader extends AbstractTrader {
   override def receive: Receive = {
     case Init =>
       register()
-    case Buy(partOfCashToSpend: Double) =>
-      buy(partOfCashToSpend)
-    case Sell(partOfStocksToSell: Double) =>
-      sell(partOfStocksToSell)
+    case Buy(partOfCashToSpend: Double, price: Double) =>
+      tryToBuy(price, partOfCashToSpend)
+    case Sell(partOfStocksToSell: Double, price: Double) =>
+      tryToSell(price, partOfStocksToSell)
   }
 
-  def buy(partOfCashToSpend: Double): Unit = {
-      //TODO
+  def tryToBuy(price: Double, partOfCashToSpend: Double): Unit = {
+    val quantity = (cash * partOfCashToSpend/price).toInt
+    buy(price, quantity)
   }
 
-  def sell(partOfStocksToSell: Double): Unit = {
-      //TODO
+  def tryToSell(price: Double, partOfStocksToSell: Double): Unit = {
+    val quantity = (stocks * partOfStocksToSell).toInt
+    sell(price, quantity)
   }
 }
