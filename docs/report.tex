@@ -1,6 +1,7 @@
 \documentclass[11pt,a4paper]{article}
 
 % basic packages
+\usepackage{pbox}
 \usepackage{float}
 \usepackage{fullpage}
 \usepackage{polski}
@@ -131,33 +132,46 @@ są używane do~komunikacji z~agentami. Serwer ma cztery główne zadania:
   \end{itemize}
 \end{multicols}
 
-Serwer giełdy, po uruchomieniu, ustala liczbę dostępnych akcji oraz tworzy historię zmian cen (na~podstawie
-cen akcji firmy Google).
+Serwer giełdy, po uruchomieniu, ustala liczbę dostępnych akcji oraz tworzy historię zmian cen (na~podstawie cen akcji firmy Google).
 
-\paragraph{Komunikacja z~agentami}
-W~celu komunikacji z~agentami, serwer udostępnia \textit{API} zgodne ze~specyfikacją \textit{REST}. Dostępne
-są następujące metody:
+\paragraph{Kontrolowanie przebiegu symulacji}
+W~celu kontroli przebiegu symulacji, serwer udostępnia \textit{API} zgodne ze~specyfikacją \textit{REST}. Dostępne są~następujące metody:
 \begin{figure}[H]
-  \begin{tabularx}{\textwidth}{ |p{2cm}|p{1cm}|p{5cm}|p{2.5cm}|X| }
-    \hline \textbf{Adres} & \textbf{Typ} & \textbf{Parametry} & \textbf{Zwracana wartość} & \textbf{Opis} \\ \hline
-    /brokers & POST & - & ID zarejestrowanego brokera & Metoda służąca do~rejestrowania nowego agenta w~symulacji. \\ \hline
-    /stock/price & GET & \textbf{day} numer iteracji & cena akcji w~danej iteracji & Metoda służąca do~pobierania historycznej ceny akcji. \\ \hline
-    /stock/buy & POST & \textbf{price} proponowana cena, \textbf{amount} liczba akcji do~kupienia & liczba kupionych akcji i~ich cena & Metoda służąca do~złożenia oferty zakupu akcji przez agenta. \\ \hline
-    /stock/sell & POST & \textbf{price} proponowana cena, \textbf{amount} liczba akcji do~sprzedania & liczba kupionych akcji i~ich cena & Metoda służąca do~złożenia oferty sprzedaży akcji przez agenta. \\ \hline
+  \begin{tabularx}{\textwidth}{ |p{2.5cm}|p{3.4cm}|p{3cm}|X| }
+    \hline \textbf{Typ oraz \newline adres} & \textbf{Parametry} & \textbf{Zwracana \newline wartość} & \textbf{Opis} \\ \hline
+    GET \newline / & - & kod HTML & Metoda służąca wyświetlania aktualnych danych o~symulacji w~przeglądarce. \\ \hline
+    POST \newline /step & - & - & Metoda służąca do~uruchomienia jednego przebiegu symulacji. \\ \hline
+    POST \newline /run & - & - & Metoda służąca do~automatycznego uruchomienia symulacji -- kolejne kroki (sesje) będą wykonywane w~równych odstępach czasu. \\ \hline
+  \end{tabularx}
+\end{figure}
+
+\newpage
+\paragraph{Komunikacja z~agentami}
+W~celu komunikacji z~agentami, serwer również udostępnia \textit{API} zgodne ze~specyfikacją \textit{REST}. Dostępne są~następujące metody:
+\begin{figure}[H]
+  \begin{tabularx}{\textwidth}{ |p{2.5cm}|p{3.4cm}|p{3cm}|X| }
+    \hline \textbf{Typ oraz \newline adres} & \textbf{Parametry} & \textbf{Zwracana \newline wartość} & \textbf{Opis} \\ \hline
+    GET \newline /day & - & aktualna iteracja & Metoda służąca do~pobierania aktualnego numeru iteracji symulacji. \\ \hline
+    POST \newline /traders & - & dane zarejestrowanego agenta (ID, ilość dostępnych pieniędzy oraz liczba akcji) & Metoda służąca do~rejestrowania nowego agenta w~symulacji. \\ \hline
+    GET \newline /traders/id & \textbf{id} identyfikator agenta & dane zarejestrowanego agenta (ID, ilość dostępnych pieniędzy oraz liczba akcji) & Metoda służąca do~pobierania aktualnego stanu agenta (w~szczególności ilości dostępnych pieniędzy i~liczby posiadanych akcji). \\ \hline
+    GET \newline /stock/price & \textbf{day} numer iteracji & cena akcji w~danej iteracji & Metoda służąca do~pobierania historycznej ceny akcji. \\ \hline
+    GET \newline /stock/history & - & tabela z~historycznymi cenami & Metoda służąca do~pobierania całej dostępnej historii cen akcji. \\ \hline
+    POST \newline /stock/buy & \textbf{price} cena, \newline \textbf{stocks} liczba akcji & - & Metoda służąca do~złożenia oferty zakupu akcji przez agenta. \\ \hline
+    POST \newline /stock/sell & \textbf{price} cena, \newline \textbf{stocks} liczba akcji & - & Metoda służąca do~złożenia oferty sprzedaży akcji przez agenta. \\ \hline
   \end{tabularx}
 \end{figure}
 
 \paragraph{Wyliczanie ceny akcji}
-Aktualna cena akcji (w~danej iteracji) jest wyznaczana na~podstawie aktualnych ofert (czyli popytu oraz podaży
-dla danej akcji) jako cena równowagi rynkowej.
+Aktualna cena akcji (w~danej iteracji) jest wyznaczana na~podstawie aktualnych ofert (czyli popytu oraz podaży dla danej akcji) jako średnia cena z~transakcji zawartych w~danym kroku symulacji.
 
 \paragraph{Prezentacja przebiegu symulacji}
-W~trakcie trwania symulacji, serwer będzie udostępniał stronę internetową dostępną z~poziomu przeglądarki. Będą na~niej dostępne dane nt. aktualnego przebiegu symulacji, między innymi wykres ceny akcji.
+W~trakcie trwania symulacji, serwer będzie udostępniał stronę internetową dostępną z~poziomu przeglądarki. Będą na~niej dostępne dane nt. aktualnego przebiegu symulacji.
 
 \subsubsection{Agent indywidualny}
 \paragraph{Strategia}
 Jedyne informacje, jakie wpływają na~decyzje o~kupnie lub sprzedaży akcji przez~agenta indywidualnego, to~historia zmian cen akcji. W~realizowanym projekcie przyjęto, że~agent kupuje akcje, jeśli ich cena w~ciągu ostatnich k iteracji wzrosła i sprzedaje, jeśli ich cena w~ciągu ostatnich k iteracji spadła.
 
+\newpage
 \subsubsection{Agent grupowy}
 \paragraph{Strategia}
 W~przeciwieństwie do~agentów indywidualnych agenty grupowe podejmują decyzję zarówno na~podstawie informacji o~zmianach cen akcji, jak i~na~podstawie informacji o~zamiarach innych agentów grupowych. Wszystkie agenty grupowe tworzą jedną grupę, która stara się~maksymalizować średni zysk przypadający na~członka grupy, poprzez tworzenie baniek spekulacyjnych. 
@@ -189,8 +203,6 @@ Konieczne było zdefiniowanie interfejsu komunikacyjnego właściwego dla~tego t
 \end{figure}
 
 \paragraph{Platforma MAS}
-Do~implementacji agentów postanowiono wykorzystać język Scala. Do~zapewnienia komunikacji pomiędzy agentami
-grupowymi wykorzystano platformę Akka.
-
+Do~implementacji agentów postanowiono wykorzystać język Scala. Do~zapewnienia komunikacji pomiędzy agentami grupowymi wykorzystano platformę Akka.
 
 \end{document}

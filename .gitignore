@@ -59,3 +59,8 @@ target/
 # Idea IDE
 .idea
 project
+
+# LaTeX docs
+docs/*.log
+docs/*.aux
+docs/*.out
